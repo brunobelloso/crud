@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User'); // Adjust the path based on your project structure
 const metadata = require('../metadata'); // Adjust the path based on your project structure
 
+
 // Register route
 router.get('/', (req, res) => {
     // Pass the pageTitle variable from metadata.js when rendering the view
