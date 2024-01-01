@@ -3,38 +3,43 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const User = require('../models/User'); // Adjust the path based on your project structure
-const metadata = require('../metadata'); // Adjust the path based on your project structure
+const User = require('../models/User');
+const metadata = require('../metadata');
 
-
-// Register route
+// Render registration page
 router.get('/', (req, res) => {
-    // Pass the pageTitle variable from metadata.js when rendering the view
-    res.render('register', { pageTitle: metadata.pageTitle });
+    // Define metadata for the registration page
+    const registerMetadata = { pageTitle: 'Register | ' + metadata.siteTitle, ...metadata };
+    res.render('register', { registerMetadata, user: req.user });
 });
 
+// Handle registration form submission
 router.post('/', async (req, res) => {
     try {
+        // Extract form data
         const { username, password, fullName, role, area } = req.body;
 
-        // Validate username using a regular expression
+        // Validate username format
         const usernameRegex = /^[a-z0-9_-]+$/;
         if (!usernameRegex.test(username)) {
-            return res.status(400).send('Formato de nombre de usuario no válido. Utilice solo letras minúsculas, números, guiones bajos y guiones.');
+            return res.status(400).send('Invalid username format. Use only lowercase letters, numbers, underscores, and hyphens.');
         }
 
-        // Perform registration logic (hash password, create user, etc.)
+        // Hash the password before storing it
         const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create a new user instance and save it to the database
         const user = new User({ username, password: hashedPassword, fullName, role, area });
         await user.save();
 
-        // Redirect to login page after successful registration
+        // Redirect to the login page after successful registration
         res.redirect('/login');
     } catch (error) {
-        // Handle registration errors
+        // Log and handle registration failure
         console.error(error);
         res.status(500).send('Registration failed');
     }
 });
 
+// Export the router for use in the main application
 module.exports = router;

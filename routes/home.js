@@ -2,11 +2,14 @@
 
 const express = require('express');
 const router = express.Router();
-const metadata = require('../metadata'); // Adjust the path based on your project structure
+const metadata = require('../metadata');
 
+// Render home page
 router.get('/', (req, res) => {
-    // Pass the pageTitle variable from metadata.js when rendering the view
-    res.render('home', { pageTitle: metadata.pageTitle, user: req.user });
+    // Define metadata for the home page
+    const homeMetadata = { pageTitle: 'Home | ' + metadata.siteTitle, ...metadata };
+    res.render('home', { homeMetadata, user: req.user });
 });
 
+// Export the router for use in the main application
 module.exports = router;
