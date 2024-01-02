@@ -1,24 +1,25 @@
 <!-- views/home.ejs -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <%- include('Head.ejs', { ...homeMetadata, user: user }) %>
 
 <body>
-    <%- include('Navbar.ejs') %>
-        <div class="container">
-            <!-- Include the navbar -->
-            <% if (user) { %>
-                <div class="alert alert-success mt-3">
-                    <h2>Welcome, <%= user.fullName %>!</h2>
-                </div>
-                <% } else { %>
-                    <div class="alert alert-warning mt-3">
-                        <h2>You are not logged in.</h2>
-                    </div>
-                    <% } %>
-        </div>
-        <%- include('Scripts.ejs') %>
+    <%- include('navbar.ejs', { user: user }) %>
+    <div class="container">
+
+        <% if (user) { %>
+            <div class="alert alert-success mt-3">
+                <h2>Welcome, <%= user.fullName %>!</h2>
+            </div>
+        <% } else { %>
+            <div class="alert alert-warning mt-3">
+                <h2>You are not logged in.</h2>
+            </div>
+        <% } %>
+    </div>
+    <%- include('Scripts.ejs') %>
 </body>
 
 </html>

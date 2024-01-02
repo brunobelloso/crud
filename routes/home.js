@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const metadata = require('../metadata');
+const metadata = require('../config/metadata');
 
 // Render home page
 router.get('/', (req, res) => {

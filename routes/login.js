@@ -5,23 +5,37 @@ const router = express.Router();
 const passport = require('passport');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
-const metadata = require('../metadata');
+const metadata = require('../config/metadata');
 
 // Render login page
 router.get('/', (req, res) => {
-    // Define metadata for the login page
     const loginMetadata = { pageTitle: 'Login | ' + metadata.siteTitle, ...metadata };
     res.render('login', { loginMetadata, user: req.user });
 });
 
-// Handle login form submission using Passport authentication
-router.post('/',
-    passport.authenticate('local', {
-        successRedirect: '/',
-        failureRedirect: '/login',
-        failureFlash: true  
-    })
-);
+// Handle login form submission
+router.post('/', async (req, res, next) => {
+    const { username, password } = req.body;
 
-// Export the router for use in the main application
+    try {
+        // Check if the user exists in the database
+        const user = await User.findOne({ username: username });
+
+        if (!user) {
+            // User does not exist, redirect or respond accordingly
+            return res.redirect('/login-invalid-user');
+        }
+
+        // If the user exists, proceed with Passport authentication
+        passport.authenticate('local', {
+            successRedirect: '/',
+            failureRedirect: '/login-invalid-pass',
+        })(req, res, next);
+
+    } catch (error) {
+        // Handle potential errors during the database query
+        next(error);
+    }
+});
+
 module.exports = router;

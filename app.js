@@ -5,13 +5,16 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
-const mongoose = require('mongoose');
+const connectDB = require('./config/database');
 const bcrypt = require('bcrypt');
 const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/User');
 const homeRoutes = require('./routes/home');
-const registerRoutes = require('./routes/register');
+const registerUserRoutes = require('./routes/registerUser');
 const loginRoutes = require('./routes/login');
+const loginInvalidPassRoutes = require('./routes/loginInvalidPass');
+const loginInvalidUserRoutes = require('./routes/loginInvalidUser');
+const registerAreaRoutes = require('./routes/registerArea');
 const logoutRoutes = require('./routes/logout');
 
 // Create an Express application
@@ -21,6 +24,9 @@ const app = express();
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Connect to MongoDB
+connectDB(); // Use the connectDB function from the database module
 
 // Configure session middleware
 app.use(session({
@@ -32,11 +38,6 @@ app.use(session({
 // Initialize and use Passport for authentication
 app.use(passport.initialize());
 app.use(passport.session());
-
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.error(err));
 
 // Configure Passport to use a local strategy for authentication
 passport.use(new LocalStrategy(
@@ -93,14 +94,11 @@ app.use((err, req, res, next) => {
 // Set up routes
 app.use('/', homeRoutes);
 app.use('/login', loginRoutes);
-app.use('/register', registerRoutes);
+app.use('/login-invalid-pass', loginInvalidPassRoutes);
+app.use('/login-invalid-user', loginInvalidUserRoutes);
+app.use('/register-user', registerUserRoutes);
+app.use('/register-area', registerAreaRoutes);
 app.use('/logout', logoutRoutes);
-
-// Logout route
-app.get('/logout', (req, res) => {
-    req.logout();
-    res.redirect('/');
-});
 
 // Start the server on the specified port
 const PORT = process.env.PORT || 3000;
